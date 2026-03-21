@@ -1,0 +1,34 @@
+mini-social-network/
+│
+├── client/                # React frontend
+│
+├── server/                # PHP backend
+│   ├── config/
+│   │   └── database.php
+│   │
+│   ├── controllers/
+│   │   ├── AuthController.php
+│   │   ├── UserController.php
+│   │   ├── PostController.php
+│   │   ├── CommentController.php
+│   │   └── FollowController.php
+│   │
+│   ├── models/
+│   │   ├── User.php
+│   │   ├── Post.php
+│   │   ├── Comment.php
+│   │   └── Follow.php
+│   │
+│   ├── routes/
+│   │   └── api.php
+│   │
+│   ├── middleware/
+│   │   └── authMiddleware.php
+│   │
+│   ├── uploads/
+│   │
+│   ├── index.php          # entry point
+│   └── .env
+│
+├── database/
+│   └── schema.sql
