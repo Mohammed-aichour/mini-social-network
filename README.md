@@ -8,6 +8,10 @@
 [![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev/)
 [![Status](https://img.shields.io/badge/Status-Architected%20%26%20Implemented-success)](#)
 
+<p align="center">
+  <img src="screenshots/mini_social_network_preview.png" alt="Aperçu Mini Social Network" width="100%">
+</p>
+
 ---
 
 ## 📌 Présentation du Projet
