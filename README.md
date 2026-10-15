@@ -69,13 +69,99 @@ mini-social-network/
 
 ---
 
-## 🗄️ Modèle Relationnel (Database Schema)
+---
 
-- **`users`** : Gestion des comptes (`id`, `username`, `email`, `password_hash`, `avatar_url`, `bio`, timestamps).
-- **`posts`** : Publications avec support d'image (`id`, `user_id`, `content`, `image_url`, timestamps).
-- **`comments`** : Commentaires rattachés aux publications (`id`, `post_id`, `user_id`, `content`, timestamps).
-- **`likes`** : Likes avec contrainte d'unicité `(user_id, post_id)` pour prévenir les doublons.
-- **`follows`** : Relations asymétriques `(follower_id, following_id)` pour le suivi de comptes.
+## 📡 Points d'Accès de l'API RESTful (PHP)
+
+| Méthode | Route | Contrôleur / Action | Authentification |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | `AuthController@register` | Publique |
+| `POST` | `/api/auth/login` | `AuthController@login` | Publique |
+| `GET` | `/api/posts` | `PostController@index` | Bearer Token |
+| `POST` | `/api/posts` | `PostController@store` | Bearer Token |
+| `GET` | `/api/posts/{id}` | `PostController@show` | Bearer Token |
+| `POST` | `/api/posts/{id}/comments` | `CommentController@store` | Bearer Token |
+| `POST` | `/api/users/{id}/follow` | `FollowController@toggle` | Bearer Token |
+
+---
+
+## 🏛️ Architecture & Modèle Relationnel
+
+### Diagramme de Séquence : Flux d'Authentification & Publication
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Utilisateur
+    participant React as Frontend React (Vite)
+    participant PHP as API PHP (server/routes/api.php)
+    participant Auth as Middleware d'Authentification
+    participant MySQL as Base MySQL 8.0
+
+    User->>React: Saisie identifiants & Connexion
+    React->>PHP: POST /api/auth/login
+    PHP->>MySQL: Vérification hash mot de passe (password_verify)
+    MySQL-->>PHP: Tuple utilisateur validé
+    PHP-->>React: Token d'authentification JSON
+    User->>React: Rédiger publication & valider
+    React->>PHP: POST /api/posts (Bearer Token)
+    PHP->>Auth: Vérification intégrité Token
+    Auth-->>PHP: Utilisateur autorisé
+    PHP->>MySQL: INSERT INTO posts (user_id, content, created_at)
+    MySQL-->>PHP: Post ID généré
+    PHP-->>React: 201 Created (Post payload)
+    React-->>User: Mise à jour immédiate du fil d'actualité
+```
+
+### Schéma Entité-Association (ERD)
+
+```mermaid
+erDiagram
+    USERS ||--o{ POSTS : "publie"
+    USERS ||--o{ COMMENTS : "rédige"
+    POSTS ||--o{ COMMENTS : "contient"
+    USERS ||--o{ LIKES : "aime"
+    POSTS ||--o{ LIKES : "reçoit"
+    USERS ||--o{ FOLLOWS : "suit"
+
+    USERS {
+        int id PK
+        string username
+        string email
+        string password_hash
+        string avatar_url
+        text bio
+        datetime created_at
+    }
+
+    POSTS {
+        int id PK
+        int user_id FK
+        text content
+        string image_url
+        datetime created_at
+    }
+
+    COMMENTS {
+        int id PK
+        int post_id FK
+        int user_id FK
+        text content
+        datetime created_at
+    }
+
+    LIKES {
+        int user_id PK, FK
+        int post_id PK, FK
+        datetime created_at
+    }
+
+    FOLLOWS {
+        int follower_id PK, FK
+        int following_id PK, FK
+        datetime created_at
+    }
+```
 
 ---
 
